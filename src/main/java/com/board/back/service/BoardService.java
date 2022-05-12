@@ -19,4 +19,9 @@ public class BoardService {
 		return boardRepository.findAll();
 	}
 
+	// create board
+	public Board createBoard(Board board) {
+		return boardRepository.save(board);
+	}
+
 }
