@@ -11,17 +11,40 @@ import org.springframework.stereotype.Service;
 import com.board.back.exception.ResourceNotFoundException;
 import com.board.back.model.Board;
 import com.board.back.repository.BoardRepository;
+import com.board.back.util.PagingUtil;
 
 @Service
 public class BoardService {
 
 	@Autowired
 	private BoardRepository boardRepository;
+
+	public int findAllCount() {
+		return (int) boardRepository.count();
+	}
 	
     // Repository를 호출해서 글목록 데이터를 리턴하는 메소드 
 	// get boards data
-	public List<Board> getAllBoard() {
-		return boardRepository.findAll();
+	public ResponseEntity<Map> getAllBoard(Integer pNum) {
+		Map result = null;
+		
+		PagingUtil pu = new PagingUtil(pNum, 5, 5); // ($1:표시할 현재 페이지, $2:한페이지에 표시할 글 수, $3:한 페이지에 표시할 페이지 버튼의 수 )
+		List<Board> list = boardRepository.findFromTo(pu.getObjectStartNum(), pu.getObjectCountPerPage());
+		pu.setObjectCountTotal(findAllCount());
+		pu.setCalcForPaging();
+		
+		System.out.println("pNum : "+pNum);
+		System.out.println(pu.toString());
+		
+		if (list == null || list.size() == 0) {
+			return null;
+		}
+		
+		result = new HashMap<>();
+		result.put("pagingData", pu);
+		result.put("list", list);
+		
+		return ResponseEntity.ok(result);
 	}
 
 	// create board

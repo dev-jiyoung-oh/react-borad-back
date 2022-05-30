@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.board.back.model.Board;
@@ -26,15 +27,13 @@ public class BoardController {
 	private BoardService boardService;
 
     // Service를 호출해서 글목록의 데이터를 리턴하는 메소드
+	// 페이징 처리를 할 수 있도록 수정
 	// get all board 
 	@GetMapping("/board")
-	public List<Board> getAllBoards() {
-		List<Board> list = boardService.getAllBoard();
+	public ResponseEntity<Map> getAllBoards(@RequestParam(value = "pNum", required=false) Integer pNum) {
+		if (pNum == null || pNum <= 0) pNum = 1;
 		
-		for(Board b : list) {
-			System.out.println(b.toString());
-		}
-		return list;
+		return boardService.getAllBoard(pNum);
 	}
 	
 	// create board
