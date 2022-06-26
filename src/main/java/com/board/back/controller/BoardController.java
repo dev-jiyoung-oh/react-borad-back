@@ -1,8 +1,11 @@
 package com.board.back.controller;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.board.back.model.Board;
@@ -26,14 +28,11 @@ public class BoardController {
 	@Autowired
 	private BoardService boardService;
 
-    // Service를 호출해서 글목록의 데이터를 리턴하는 메소드
-	// 페이징 처리를 할 수 있도록 수정
+    // Service를 호출해서 글목록의 데이터를 리턴하는 메소드(페이징O)
 	// get all board 
 	@GetMapping("/board")
-	public ResponseEntity<Map> getAllBoards(@RequestParam(value = "pNum", required=false) Integer pNum) {
-		if (pNum == null || pNum <= 0) pNum = 1;
-		
-		return boardService.getAllBoard(pNum);
+	public ResponseEntity<Page<Board>> getAllBoards(@PageableDefault(page=0, size=10, sort="no", direction=Sort.Direction.DESC) Pageable pageable) {
+		return boardService.getAllBoard(pageable);
 	}
 	
 	// create board

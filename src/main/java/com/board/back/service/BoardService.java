@@ -1,17 +1,17 @@
 package com.board.back.service;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.board.back.exception.ResourceNotFoundException;
 import com.board.back.model.Board;
 import com.board.back.repository.BoardRepository;
-import com.board.back.util.PagingUtil;
 
 @Service
 public class BoardService {
@@ -25,26 +25,14 @@ public class BoardService {
 	
     // Repository를 호출해서 글목록 데이터를 리턴하는 메소드 
 	// get boards data
-	public ResponseEntity<Map> getAllBoard(Integer pNum) {
-		Map result = null;
+	public ResponseEntity<Page<Board>> getAllBoard(Pageable pageable) {
+		Page<Board> pageList = boardRepository.findAll(pageable);
 		
-		PagingUtil pu = new PagingUtil(pNum, 5, 5); // ($1:표시할 현재 페이지, $2:한페이지에 표시할 글 수, $3:한 페이지에 표시할 페이지 버튼의 수 )
-		List<Board> list = boardRepository.findFromTo(pu.getObjectStartNum(), pu.getObjectCountPerPage());
-		pu.setObjectCountTotal(findAllCount());
-		pu.setCalcForPaging();
-		
-		System.out.println("pNum : "+pNum);
-		System.out.println(pu.toString());
-		
-		if (list == null || list.size() == 0) {
-			return null;
+		for(Board b : pageList) {
+			System.out.println(b);
 		}
 		
-		result = new HashMap<>();
-		result.put("pagingData", pu);
-		result.put("list", list);
-		
-		return ResponseEntity.ok(result);
+		return ResponseEntity.ok(pageList);
 	}
 
 	// create board
